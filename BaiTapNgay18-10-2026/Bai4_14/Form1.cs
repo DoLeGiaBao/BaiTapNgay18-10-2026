@@ -1,0 +1,16 @@
+using System.ComponentModel;
+
+namespace Bai4_14;
+public class Form1:Form
+{
+ ToolStripStatusLabel duty; ToolStripProgressBar progress;
+ public Form1(){Text="Bài 4.14 - Hospital MDI";IsMdiContainer=true;WindowState=FormWindowState.Maximized;
+ var menu=new MenuStrip();var sys=new ToolStripMenuItem("Hệ thống");var logout=new ToolStripMenuItem("Đăng xuất");var reload=new ToolStripMenuItem("Nạp lại dữ liệu");var exit=new ToolStripMenuItem("Thoát");logout.Click+=(_,_)=>{foreach(Form f in MdiChildren)f.Close();MessageBox.Show("Đã đăng xuất.");};reload.Click+=(_,_)=>MessageBox.Show("Đã nạp lại dữ liệu (mô phỏng).");exit.Click+=(_,_)=>Close();sys.DropDownItems.AddRange(new ToolStripItem[]{logout,reload,new ToolStripSeparator(),exit});
+ var manage=new ToolStripMenuItem("Quản lý");var p=new ToolStripMenuItem("Hồ sơ Bệnh nhân");var d=new ToolStripMenuItem("Danh mục Bác sĩ");var dep=new ToolStripMenuItem("Danh mục Khoa/Phòng");p.Click+=(_,_)=>OpenChild<frmPatientProfiles>();d.Click+=(_,_)=>OpenChild<frmDoctorSchedule>();dep.Click+=(_,_)=>OpenChild<frmDepartmentCatalog>();manage.DropDownItems.AddRange(new ToolStripItem[]{p,d,dep});
+ var win=new ToolStripMenuItem("Cửa sổ");var c=new ToolStripMenuItem("Xếp tầng");var h=new ToolStripMenuItem("Ngang");var v=new ToolStripMenuItem("Dọc");var all=new ToolStripMenuItem("Đóng tất cả");c.Click+=(_,_)=>LayoutMdi(MdiLayout.Cascade);h.Click+=(_,_)=>LayoutMdi(MdiLayout.TileHorizontal);v.Click+=(_,_)=>LayoutMdi(MdiLayout.TileVertical);all.Click+=(_,_)=>{foreach(Form f in MdiChildren)f.Close();};win.DropDownItems.AddRange(new ToolStripItem[]{c,h,v,new ToolStripSeparator(),all});menu.Items.AddRange(new ToolStripItem[]{sys,manage,win});MainMenuStrip=menu;Controls.Add(menu);
+ var strip=new StatusStrip();duty=new ToolStripStatusLabel("Bác sĩ trực: BS. Nguyễn Minh");progress=new ToolStripProgressBar{Minimum=0,Maximum=100,Value=65,Width=180};strip.Items.AddRange(new ToolStripItem[]{duty,new ToolStripStatusLabel{Spring=true},new ToolStripStatusLabel("Tiến trình"),progress});Controls.Add(strip);}
+ void OpenChild<T>() where T:Form,new(){foreach(Form f in MdiChildren)if(f is T){f.Activate();return;}new T{MdiParent=this}.Show();}
+}
+public class frmPatientProfiles:Form{public frmPatientProfiles(){Text="Hồ sơ Bệnh nhân";Size=new Size(800,500);var g=new DataGridView{Dock=DockStyle.Fill,AutoGenerateColumns=true,ReadOnly=true};g.DataSource=new BindingList<Patient>{new(){MaBN="BN001",HoTen="Nguyễn Minh Anh",SDT="0912345678",GhiChu="Khám tổng quát"},new(){MaBN="BN002",HoTen="Trần Quốc Bảo",SDT="0987654321",GhiChu="Tái khám"}};Controls.Add(g);}class Patient{public string MaBN{get;set;} public string HoTen{get;set;} public string SDT{get;set;} public string GhiChu{get;set;}}}
+public class frmDoctorSchedule:Form{public frmDoctorSchedule(){Text="Lịch trực bác sĩ";Size=new Size(700,400);Controls.Add(new Label{Dock=DockStyle.Fill,TextAlign=ContentAlignment.MiddleCenter,Font=new Font("Segoe UI",16),Text="LỊCH TRỰC BÁC SĨ\nBS. Nguyễn Minh: 08:00 - 16:00\nBS. Trần Lan: 16:00 - 22:00"});}}
+public class frmDepartmentCatalog:Form{public frmDepartmentCatalog(){Text="Danh mục Khoa/Phòng";Size=new Size(600,350);var list=new ListBox{Dock=DockStyle.Fill};list.Items.AddRange(new object[]{"Khoa Nội","Khoa Ngoại","Khoa Nhi","Khoa Khám bệnh"});Controls.Add(list);}}
